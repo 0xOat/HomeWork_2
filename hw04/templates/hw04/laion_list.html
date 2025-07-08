@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laion Dataset</title>
+    <link rel="stylesheet" href="{% static 'laion_style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Laion Dataset</h1>
+        
+        {% if error %}
+            <div class="error">
+                <strong>เกิดข้อผิดพลาด:</strong> {{ error }}
+            </div>
+        {% endif %}
+        
+        {% if images %}
+            <div class="info">
+                หน้า {{ page }} จาก {{ total_pages }} | แสดง {{ images|length }} รายการ จากทั้งหมด {{ total_count }} รายการ
+            </div>
+            
+            <div class="image-grid">
+                {% for image in images %}
+                    <div class="image-item">
+                        <img src="{{ image.1 }}" 
+                             alt="Image {{ image.0 }}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="image-error" style="display: none;">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                            <div style="margin-top: 8px;">ไม่สามารถโหลดรูปภาพได้</div>
+                        </div>
+                        <div class="image-info">
+                            <div class="image-id">ID: {{ image.0 }}</div>
+                            <div class="image-caption">
+                                {% if image.2 %}
+                                    {{ image.2 }}
+                                {% else %}
+                                    ไม่มีคำอธิบาย
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination">
+                {% if has_previous %}
+                    <a href="?page=1">หน้าแรก</a>
+                    <a href="?page={{ previous_page }}">« ก่อนหน้า</a>
+                {% else %}
+                    <span class="disabled">หน้าแรก</span>
+                    <span class="disabled">« ก่อนหน้า</span>
+                {% endif %}
+                
+                <span class="current">{{ page }}</span>
+                <span>จาก {{ total_pages }}</span>
+                
+                {% if has_next %}
+                    <a href="?page={{ next_page }}">ถัดไป »</a>
+                    <a href="?page={{ total_pages }}">หน้าสุดท้าย</a>
+                {% else %}
+                    <span class="disabled">ถัดไป »</span>
+                    <span class="disabled">หน้าสุดท้าย</span>
+                {% endif %}
+            </div>
+            
+            <div class="pagination">
+                <form method="get" style="display: inline;">
+                    <label>ไปหน้า:</label>
+                    <input type="number" name="page" min="1" max="{{ total_pages }}" 
+                           value="{{ page }}" style="width: 60px; padding: 4px;">
+                    <button type="submit" style="padding: 4px 8px;">Go</button>
+                </form>
+            </div>
+            
+        {% else %}
+            <div class="no-data">
+                ไม่พบข้อมูลรูปภาพ
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
