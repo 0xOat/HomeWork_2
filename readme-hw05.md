@@ -2,7 +2,7 @@
 - [WSL Installation](#wsl-installation)
 - [Install ClickHouse](#install-clickhouse)
 - [Data preparation and Import data](#data-preparation-and-import-data)
-- [Setup ClickHouse](#setup-clickhouse)
+- [Superset Installation](#superset-installation)
 - [ClickHouse Superset Integration](#clickhouse-superset-integration)
 - [Project Installation](#project-installation)
 
@@ -305,3 +305,5 @@ pip install -r requirements.txt
 ```bash
 python manage.py runserver
 ```
+
+เมื่อเสร็จสิ้นการตั้งค่าและการสร้างกราฟ คุณจะสามารถแสดงข้อมูลจาก ClickHouse ใน Superset ได้ พร้อมกับการวิเคราะห์ข้อมูลในรูปแบบ interactive ผ่าน Superset dashboard.

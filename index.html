@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Warehousing</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0"></script>
+    <style>
+        .main-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            display: block; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .main-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .main-content th, .main-content td {
+            border: 1px solid #e2e8f0; 
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .main-content th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+        .main-content tr:nth-child(even) {
+            background-color: #f8fafc; 
+        }
+        .main-content pre {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .main-content code {
+            font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen bg-gray-100 font-sans antialiased">
+    <aside class="fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white overflow-y-auto">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold mb-6">Docs Title</h1>
+            <nav>
+                <ul>
+                    <li class="mb-2"><a href="#wsl-installation" class="block py-2 px-4 rounded hover:bg-gray-700">WSL Installation</a></li>
+                    <li class="mb-2"><a href="#install-clickhouse" class="block py-2 px-4 rounded hover:bg-gray-700">Install ClickHouse</a></li>
+                    <li class="mb-2"><a href="#data-preparation-and-import-data" class="block py-2 px-4 rounded hover:bg-gray-700">Data preparation and Import data</a></li>
+                    <li class="mb-2"><a href="#superset-installation" class="block py-2 px-4 rounded hover:bg-gray-700">Superset Installation</a></li>
+                    <li class="mb-2"><a href="#clickhouse-superset-integration" class="block py-2 px-4 rounded hover:bg-gray-700">ClickHouse Superset Integration</a></li>
+                    <li class="mb-2"><a href="#project-installation" class="block py-2 px-4 rounded hover:bg-gray-700">Project Installation</a></li>
+                    <li class="mb-2"><a href="#summarize" class="block py-2 px-4 rounded hover:bg-gray-700">Summarize</a></li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden ml-64">
+        <header class="bg-white shadow p-6 flex items-center justify-between">
+            <h2 class="text-3xl font-bold text-gray-800">Data Warehousing</h2>
+            <div class="relative">
+                <input type="text" placeholder="Search documentation..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 main-content">
+            <div class="bg-white p-8 rounded-lg shadow-md mb-8" id="wsl-installation">
+                <h2 class="text-2xl font-semibold mb-4">WSL Installation</h2>
+                <pre><code class="language-bash">wsl --install</code></pre>
+                <pre><code class="language-bash">wsl -d Ubuntu</code></pre>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-md mb-8" id="install-clickhouse">
+                <h2 class="text-2xl font-semibold mb-4">Install ClickHouse</h2>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">Setup the Debian repository</h3>
+                <pre><code class="language-bash"># Install prerequisite packages
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg
+
+# Download the ClickHouse GPG key and store it in the keyring
+curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | sudo gpg --dearmor -o /usr/share/keyrings/clickhouse-keyring.gpg
+
+# Get the system architecture
+ARCH=$(dpkg --print-architecture)
+
+# Add the ClickHouse repository to apt sources
+echo "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg arch=${ARCH}] https://packages.clickhouse.com/deb stable main" | sudo tee /etc/apt/sources.list.d/clickhouse.list
+
+# Update apt package lists
+sudo apt-get update</code></pre>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">Install ClickHouse server and client</h3>
+                <pre><code class="language-bash">sudo apt-get install -y clickhouse-server clickhouse-client</code></pre>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">Start ClickHouse</h3>
+                <pre><code class="language-bash">sudo service clickhouse-server start</code></pre>
+                <pre><code class="language-bash">clickhouse-client</code></pre>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-md mb-8" id="data-preparation-and-import-data">
+                <h2 class="text-2xl font-semibold mb-4">Data preparation and Import data</h2>
+                <p class="text-gray-700 leading-relaxed">
+                    คู่มือนี้จะแนะนำคุณผ่านขั้นตอนการดาวน์โหลด LAION embeddings และ metadata การประมวลผลข้อมูลให้อยู่ในรูปแบบ CSV และการนำเข้าสู่ ClickHouse
+                </p>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">การเตรียมข้อมูลและการนำเข้า</h3>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">ขั้นตอนที่ 1: สร้างสคริปต์ดาวน์โหลด</h4>
+                <p class="text-gray-700 leading-relaxed">
+                    สร้างไฟล์ชื่อ <code class="bg-gray-100 p-1 rounded">download.sh</code> พร้อมเนื้อหาดังนี้:
+                </p>
+                <pre><code class="language-bash">#!/bin/bash
+number=${1}
+if [[ $number == '' ]]; then
+    number=1
+fi
+
+# ดาวน์โหลดไฟล์พร้อมระบบลองใหม่
+wget --tries=100 https://deploy.laion.ai/8f83b608504d46bb81708ec86e912220/embeddings/img_emb/img_emb_${number}.npy
+wget --tries=100 https://deploy.laion.ai/8f83b608504d46bb81708ec86e912220/embeddings/text_emb/text_emb_${number}.npy
+wget --tries=100 https://deploy.laion.ai/8f83b608504d46bb81708ec86e912220/embeddings/metadata/metadata_${number}.parquet
+
+# ประมวลผลไฟล์ที่ดาวน์โหลดมา
+python3 process.py $number</code></pre>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">ขั้นตอนที่ 2: สร้างสคริปต์ประมวลผล</h4>
+                <p class="text-gray-700 leading-relaxed">
+                    สร้างไฟล์ชื่อ <code class="bg-gray-100 p-1 rounded">process.py</code>:
+                </p>
+                <pre><code class="language-python">import pandas as pd
+import numpy as np
+import os
+import sys
+
+# รับหมายเลขไฟล์จาก command line argument
+str_i = str(sys.argv[1])
+
+# กำหนดชื่อไฟล์
+npy_file = f"img_emb_{str_i}.npy"
+metadata_file = f"metadata_{str_i}.parquet"
+text_npy = f"text_emb_{str_i}.npy"
+
+# โหลด embeddings และ metadata
+im_emb = np.load(npy_file)
+text_emb = np.load(text_npy)
+data = pd.read_parquet(metadata_file)
+
+# รวมข้อมูลเป็น DataFrame เดียว
+data = pd.concat([
+    data, 
+    pd.DataFrame({"image_embedding": [*im_emb]}), 
+    pd.DataFrame({"text_embedding": [*text_emb]})
+], axis=1, copy=False)
+
+# เลือกและเตรียมคอลัมน์
+data = data[['url', 'caption', 'NSFW', 'similarity', "image_embedding", "text_embedding"]]
+
+# แปลง embeddings เป็นรูปแบบ list และทำความสะอาด caption text
+data['image_embedding'] = data['image_embedding'].apply(lambda x: list(x))
+data['text_embedding'] = data['text_embedding'].apply(lambda x: list(x))
+data['caption'] = data['caption'].apply(lambda x: x.replace("'", " ").replace('"', " "))
+
+# บันทึกเป็น CSV และลบไฟล์ชั่วคราว
+csv_filename = f"{str_i}.csv"
+data.to_csv(csv_filename, header=False)
+os.system(f"rm {npy_file} {metadata_file} {text_npy}")</code></pre>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">ขั้นตอนที่ 3: ให้สิทธิ์การรันสคริปต์</h4>
+                <p class="text-gray-700 leading-relaxed">
+                    ให้สิทธิ์การรันสคริปต์ดาวน์โหลด:
+                </p>
+                <pre><code class="language-bash">chmod +x download.sh</code></pre>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">ขั้นตอนที่ 4: ดาวน์โหลดและประมวลผลข้อมูล</h4>
+                <p class="text-gray-700 leading-relaxed">
+                    รันสคริปต์เพื่อดาวน์โหลดและประมวลผลชุดแรก:
+                </p>
+                <pre><code class="language-bash">./download.sh 1</code></pre>
+                <blockquote class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mt-4" role="alert">
+                    <p class="font-bold">หมายเหตุ:</p>
+                    <p>คุณสามารถระบุหมายเลขชุดต่าง ๆ ได้โดยการส่งเป็น argument (เช่น <code class="bg-blue-200 p-1 rounded">./download.sh 2</code>, <code class="bg-blue-200 p-1 rounded">./download.sh 3</code> เป็นต้น)</p>
+                </blockquote>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">การตั้งค่า ClickHouse</h3>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">ขั้นตอนที่ 1: เชื่อมต่อกับ ClickHouse</h4>
+                <p class="text-gray-700 leading-relaxed">
+                    เริ่มต้น ClickHouse client:
+                </p>
+                <pre><code class="language-bash">clickhouse-client</code></pre>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">ขั้นตอนที่ 2: สร้างโครงสร้างตาราง</h4>
+                <p class="text-gray-700 leading-relaxed">
+                    รัน SQL ต่อไปนี้เพื่อสร้างตาราง LAION:
+                </p>
+                <pre><code class="language-sql">CREATE TABLE laion
+(
+    `id` Int64,
+    `url` String,
+    `caption` String,
+    `NSFW` String,
+    `similarity` Float32,
+    `image_embedding` String,    
+    `text_embedding` String     
+)
+ENGINE = MergeTree
+ORDER BY id
+SETTINGS index_granularity = 8192;</code></pre>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">ขั้นตอนที่ 3: นำเข้าข้อมูล CSV</h4>
+                <p class="text-gray-700 leading-relaxed">
+                    นำเข้าไฟล์ CSV ที่ประมวลผลแล้วเข้าสู่ตาราง:
+                </p>
+                <pre><code class="language-sql">INSERT INTO laion FROM INFILE '/path/to/your/csv/files/*.csv';</code></pre>
+                <blockquote class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mt-4" role="alert">
+                    <p class="font-bold">สำคัญ:</p>
+                    <p>เปลี่ยน <code class="bg-red-200 p-1 rounded">/path/to/your/csv/files/</code> เป็นเส้นทางจริงที่เก็บไฟล์ CSV ของคุณ</p>
+                </blockquote>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">โครงสร้างไฟล์</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    หลังจากรันสคริปต์แล้ว ไดเร็กทอรีของคุณควรมี:
+                </p>
+                <pre><code class="language-text">├── download.sh           # สคริปต์ดาวน์โหลด
+├── process.py           # สคริปต์ประมวลผล
+└── 1.csv                # ไฟล์ CSV ที่ประมวลผลแล้ว</code></pre>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-md mb-8" id="superset-installation">
+                <h2 class="text-2xl font-semibold mb-4">Superset Installation</h2>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">Get Superset</h3>
+                <pre><code class="language-bash">git clone https://github.com/apache/superset</code></pre>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">Start the latest official release of Superset</h3>
+                <pre><code class="language-bash"># Enter the repository you just cloned
+$ cd superset
+
+# Set the repo to the state associated with the latest official version
+$ git checkout tags/5.0.0
+
+# Fire up Superset using Docker Compose
+$ docker compose -f docker-compose-image-tag.yml up</code></pre>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">Log into Superset</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    ตอนนี้ไปที่ <a href="http://localhost:8088" target="_blank" class="text-blue-600 hover:underline">http://localhost:8088</a> และเข้าสู่ระบบด้วยบัญชีที่สร้างขึ้นตามค่าเริ่มต้น
+                </p>
+                <pre><code class="language-text">username: admin
+password: admin</code></pre>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-md mb-8" id="clickhouse-superset-integration">
+                <h2 class="text-2xl font-semibold mb-4">ClickHouse Superset Integration</h2>
+                <p class="text-gray-700 leading-relaxed">
+                    คู่มือการเชื่อมต่อ ClickHouse database กับ Apache Superset สำหรับการสร้างการวิเคราะห์และการแสดงผลข้อมูลแบบ interactive
+                </p>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">1. เชื่อมต่อกับ Superset Container</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    เปิด terminal:
+                </p>
+                <pre><code class="language-bash">docker exec -it superset_app bash</code></pre>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">2. ติดตั้ง ClickHouse Python Client</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    ภายใน terminal ให้ติดตั้ง ClickHouse Python client:
+                </p>
+                <pre><code class="language-bash">pip install clickhouse-connect</code></pre>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">3. เข้าสู่ระบบ Superset</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    ไปที่ <a href="http://localhost:8088" target="_blank" class="text-blue-600 hover:underline">http://localhost:8088</a> และเข้าสู่ระบบด้วยข้อมูลดังนี้:
+                </p>
+                <pre><code class="language-text">username: admin
+password: admin</code></pre>
+
+                <h3 class="text-xl font-semibold mt-6 mb-4">4. เพิ่มการเชื่อมต่อกับ ClickHouse</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    หลังจากเข้าสู่ระบบใน Superset:
+                </p>
+                <ul class="list-disc list-inside text-gray-700 leading-relaxed ml-4">
+                    <li>คลิกที่เครื่องหมาย <strong class="font-bold">+</strong> มุมขวาบน</li>
+                </ul>
+                <p class="text-center mt-4 mb-4">
+                    <img src="img/screenshot_menu.png" alt="Superset Menu Screenshot" class="inline-block max-w-full h-auto">
+                </p>
+                <ul class="list-disc list-inside text-gray-700 leading-relaxed ml-4">
+                    <li>เลือก <strong class="font-bold">Data</strong> แล้วเลือก <strong class="font-bold">Connect database</strong></li>
+                    <li>เลือก <strong class="font-bold">ClickHouse Connect</strong> ในส่วนของ <strong class="font-bold">Supported databases</strong></li>
+                </ul>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">กรอกข้อมูลการเชื่อมต่อ:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ฟิลด์</th>
+                            <th>ค่า</th>
+                            <th>คำอธิบาย</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Host</strong></td>
+                            <td>`localhost`</td>
+                            <td>Host ของ ClickHouse (หรือ IP ของเซิร์ฟเวอร์)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Port</strong></td>
+                            <td>`8123`</td>
+                            <td>พอร์ตสำหรับ HTTP (หรือ `9000` สำหรับ TCP)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Username</strong></td>
+                            <td>`default`</td>
+                            <td>Username ที่ใช้งานบน ClickHouse</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Password</strong></td>
+                            <td>*(ว่าง)*</td>
+                            <td>Password ของ ClickHouse</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Database</strong></td>
+                            <td>`default`</td>
+                            <td>ชื่อ database ที่ต้องการเชื่อมต่อ</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="text-gray-700 leading-relaxed mt-4">
+                    หลังจากกรอกข้อมูลเสร็จแล้ว:
+                </p>
+                <ul class="list-disc list-inside text-gray-700 leading-relaxed ml-4">
+                    <li>คลิก <strong class="font-bold">CONNECT</strong></li>
+                    <li>จากนั้นคลิก <strong class="font-bold">FINISH</strong> เพื่อบันทึกการเชื่อมต่อ</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">เพิ่ม Dataset จาก ClickHouse</h4>
+                <ul class="list-disc list-inside text-gray-700 leading-relaxed ml-4">
+                    <li>ไปที่ <strong class="font-bold">Datasets</strong> ใน Superset</li>
+                    <li>คลิก <strong class="font-bold">+ Dataset</strong> ที่มุมขวาบน</li>
+                    <li>กำหนดค่าต่างๆ:
+                        <ul class="list-disc list-inside text-gray-700 leading-relaxed ml-8">
+                            <li><strong class="font-bold">Database</strong>: ClickHouse Connect (Superset)</li>
+                            <li><strong class="font-bold">Schema</strong>: <code class="bg-gray-100 p-1 rounded">default</code></li>
+                            <li><strong class="font-bold">Table</strong>: <code class="bg-gray-100 p-1 rounded">laion</code> (หรือชื่อตารางที่ต้องการ)</li>
+                        </ul>
+                    </li>
+                    <li>คลิก <strong class="font-bold">Create Dataset</strong> เพื่อนำเข้าข้อมูลจากตารางใน ClickHouse</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">สร้าง Chart</h4>
+                <ul class="list-disc list-inside text-gray-700 leading-relaxed ml-4">
+                    <li>หลังจากเพิ่ม Dataset แล้ว คลิก <strong class="font-bold">Create new chart</strong></li>
+                    <li>เลือก <strong class="font-bold">Table</strong> เป็นประเภทของ Chart ที่ต้องการ</li>
+                    <li>กำหนดการตั้งค่า:
+                        <ul class="list-disc list-inside text-gray-700 leading-relaxed ml-8">
+                            <li><strong class="font-bold">Query mode</strong>: Raw records</li>
+                            <li><strong class="font-bold">Columns</strong>: เลือกคอลัมน์ที่ต้องการ เช่น <code class="bg-gray-100 p-1 rounded">id</code>, <code class="bg-gray-100 p-1 rounded">caption</code>, <code class="bg-gray-100 p-1 rounded">similarity</code></li>
+                            <li><strong class="font-bold">Ordering</strong>: ตั้งการเรียงลำดับ เช่น <code class="bg-gray-100 p-1 rounded">similarity [asc]</code></li>
+                        </ul>
+                    </li>
+                    <li>คลิก <strong class="font-bold">Create chart</strong> เพื่อสร้างกราฟที่ต้องการ</li>
+                </ul>
+
+                <h4 class="text-lg font-semibold mt-4 mb-2">ผลลัพธ์ที่ได้</h4>
+                <p class="text-gray-700 leading-relaxed">
+                    เมื่อสร้างกราฟเสร็จแล้ว คุณจะเห็น:
+                </p>
+                <p class="text-center mt-4 mb-4">
+                    <img src="img/chart_result.png" alt="Chart Result Screenshot" class="inline-block max-w-full h-auto">
+                </p>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-md mb-8" id="project-installation">
+                <h2 class="text-2xl font-semibold mb-4">Project Installation</h2>
+                <pre><code class="language-bash">git clone https://github.com/0xOat/HomeWork_2.git</code></pre>
+                <pre><code class="language-bash">cd HomeWork_2</code></pre>
+                <pre><code class="language-bash">pip install -r requirements.txt</code></pre>
+                <pre><code class="language-bash">python manage.py runserver</code></pre>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow-md mb-8" id="summarize">
+                <p class="text-gray-700 leading-relaxed mt-4">
+                    เมื่อเสร็จสิ้นการตั้งค่าและการสร้างกราฟ คุณจะสามารถแสดงข้อมูลจาก ClickHouse ใน Superset ได้ พร้อมกับการวิเคราะห์ข้อมูลในรูปแบบ interactive ผ่าน Superset dashboard.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.querySelector('header input[type="text"]');
+            const mainContent = document.querySelector('main.main-content');
+            let originalContent = mainContent.innerHTML;
+
+            const sections = Array.from(mainContent.querySelectorAll('div.bg-white'));
+            const docsData = sections.map((section, index) => {
+                const id = section.id || `section-${index}`;
+                const titleElement = section.querySelector('h2, h3, h4'); 
+                const title = titleElement ? titleElement.innerText : `Section ${index + 1}`;
+                const content = section.innerText;
+                return {
+                    id: id,
+                    title: title,
+                    content: content,
+                    element: section 
+                };
+            });
+
+            const fuseOptions = {
+                keys: [
+                    { name: 'title', weight: 0.7 }, 
+                    { name: 'content', weight: 0.3 }
+                ],
+                threshold: 0.3, 
+                ignoreLocation: true,
+                findAllMatches: true,
+                // includeMatches: true, // ถ้าต้องการดูว่าคำที่ค้นหาอยู่ตรงไหน
+                // includeScore: true, // ถ้าต้องการดูคะแนนความเกี่ยวข้อง
+            };
+
+            const fuse = new Fuse(docsData, fuseOptions);
+
+            searchInput.addEventListener('input', (event) => {
+                const query = event.target.value.trim();
+
+                if (query.length > 0) {
+                    const result = fuse.search(query);
+                    displaySearchResults(result);
+                } else {
+                    mainContent.innerHTML = originalContent;
+                    mainContent.querySelectorAll('div.bg-white').forEach(div => div.style.display = 'block'); 
+                }
+            });
+
+            function displaySearchResults(results) {
+                mainContent.querySelectorAll('div.bg-white').forEach(div => div.style.display = 'none');
+
+                if (results.length === 0) {
+                    mainContent.innerHTML = `<div class="bg-white p-8 rounded-lg shadow-md text-center text-gray-600">ไม่พบผลลัพธ์สำหรับการค้นหาของคุณ.</div>`;
+                } else {
+                    const searchResultsContainer = document.createElement('div');
+                    searchResultsContainer.className = 'search-results-container'; 
+
+                    results.forEach(item => {
+                        const originalElement = item.item.element;
+                        const resultElement = originalElement.cloneNode(true);
+                        resultElement.style.display = 'block';
+
+                        searchResultsContainer.appendChild(resultElement);
+                    });
+                    mainContent.innerHTML = '';
+                    mainContent.appendChild(searchResultsContainer); 
+                }
+            }
+        });
+    </script>
+</body>
+</html>
